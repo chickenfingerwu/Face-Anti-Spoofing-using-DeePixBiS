@@ -5,9 +5,10 @@ from PIL import Image
 from torchvision import transforms
 from random import shuffle
 import pandas as pd
+import cv2 as cv
 
 
-class PixWiseDataset():
+class PixWiseDataset:
     def __init__(self, csvfile, map_size=14,
                  smoothing=True, transform=None):
         self.data = pd.read_csv(csvfile)
@@ -21,25 +22,36 @@ class PixWiseDataset():
         masks = []
 
         for ind in self.data.index:
-            img_name = self.data.iloc[ind]['name']
-            img = Image.open(img_name)
-            # img = cv.resize(img, (224, 224))
-            # img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-            # img = np.moveaxis(img, 2, 0)
-            # img = np.asarray(img)
+            vid_name = self.data.iloc[ind]['name']
+            cap = cv.VideoCapture('./data/train/videos/' + vid_name)
+            frame_rate = cap.get(cv.CAP_PROP_FPS)
+            frame_count = 0
+            while cap.isOpened():
+                ret, frame = cap.read()
+                if not ret:
+                    print("Can't receive frame (stream end?). Exiting ...")
+                    break
+                img = Image.fromarray(frame)
+                frame_count += 1
+                if frame_count == frame_rate:
+                    # img = cv.resize(img, (224, 224))
+                    # img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+                    # img = np.moveaxis(img, 2, 0)
+                    # img = np.asarray(img)
 
-            label = self.data.iloc[ind]['label']
-            if label == 0:
-                mask = np.ones((1, self.map_size, self.map_size), dtype=np.float32) * (1 - self.label_weight)
-            else:
-                mask = np.ones((1, self.map_size, self.map_size), dtype=np.float32) * (self.label_weight)
+                    label = self.data.iloc[ind]['label']
+                    if label == 0:
+                        mask = np.ones((1, self.map_size, self.map_size), dtype=np.float32) * (1 - self.label_weight)
+                    else:
+                        mask = np.ones((1, self.map_size, self.map_size), dtype=np.float32) * self.label_weight
 
-            if self.transform:
-                img = self.transform(img)
+                    if self.transform:
+                        img = self.transform(img)
 
-            images.append(img)
-            labels.append(label)
-            masks.append(mask)
+                    images.append(img)
+                    labels.append(label)
+                    masks.append(mask)
+                    frame_count = 0
 
         labels = np.array(labels, dtype=np.float32)
 

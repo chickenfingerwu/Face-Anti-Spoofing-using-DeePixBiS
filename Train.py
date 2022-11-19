@@ -26,10 +26,10 @@ test_tfms = Compose([Resize([224, 224]),
                      ToTensor(),
                      Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
 
-train_dataset = PixWiseDataset('./train_data.csv', transform=train_tfms)
+train_dataset = PixWiseDataset('./train_zalo.csv', transform=train_tfms)
 train_ds = train_dataset.dataset()
 
-val_dataset = PixWiseDataset('./test_data.csv', transform=test_tfms)
+val_dataset = PixWiseDataset('./test_zalo.csv', transform=test_tfms)
 val_ds = val_dataset.dataset()
 
 batch_size = 10
@@ -52,4 +52,4 @@ trainer = Trainer(train_dl, val_dl, model, 1, opt, loss_fn)
 print('Training Beginning\n')
 trainer.fit()
 print('\nTraining Complete')
-torch.save(model.state_dict(), './DeePixBiS.pth')
+torch.save(model.state_dict(), './DeePixBiS_Zalo.pth')
