@@ -11,6 +11,8 @@ from Trainer import Trainer
 
 model = DeePixBiS()
 model.load_state_dict(torch.load('./DeePixBiS.pth'))
+model.enc.requires_grad_(False)
+model.dec.requires_grad_(False)
 
 loss_fn = PixWiseBCELoss()
 

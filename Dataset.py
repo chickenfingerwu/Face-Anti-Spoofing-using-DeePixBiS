@@ -29,7 +29,7 @@ class PixWiseDataset:
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret:
-                    print("Can't receive frame (stream end?). Exiting ...")
+                    #print("Can't receive frame (stream end?). Exiting ...")
                     break
                 img = Image.fromarray(frame)
                 frame_count += 1
